@@ -1,2 +1,6 @@
-api_key = "hello I'm api_key"
 wall_cmd = "nitrogen"
+
+[wallhaven]
+api_key = "hello I'm api_key"
+prefix = "wallhaven"
+

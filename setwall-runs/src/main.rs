@@ -1,6 +1,8 @@
 mod settings;
+mod wall_fetcher;
 
-use serde::Deserialize;
+use settings::Settings;
+
 use std::ffi::OsStr;
 use std::fs;
 use std::os;
@@ -12,6 +14,7 @@ use websocket::OwnedMessage;
 static WEBSOCKET_ADDRESS: &str = "127.0.0.1:7878";
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let settings = Settings::from_file("~/.config/wall_funs/config.toml".into());
     let server = websocket::sync::Server::bind(WEBSOCKET_ADDRESS).unwrap();
 
     // websocket handler spawner
@@ -43,39 +46,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn handle_connection(mut url: String) {
-    // when we don't get an image url
-    if url.contains("wallhaven.cc") && !url.contains("full") {
-        let id = url.split('/').last().unwrap();
-        let api_key = "1me7AqGu5OXo9wsduuiavxLgzT4w3Xxl";
-        let api_url = format!("https://wallhaven.cc/api/v1/w/{id}?apikey={api_key}");
-        if let Some(u) = url_from_wallhaven(api_url) {
-            url = u;
-        } else {
-            notify(dbg!("404: Wallhaven"));
-        }
-    }
-    get_image(url);
-}
-
-#[derive(Deserialize)]
-struct PathData {
-    path: String,
-}
-
-fn url_from_wallhaven(api_url: String) -> Option<String> {
-    if let Ok(response) = reqwest::blocking::get(api_url) {
-        if response.status() == 200 {
-            return Some(
-                response
-                    .json::<PathData>()
-                    .expect("Image path failed in parsing!")
-                    .path,
-            );
-        }
-    }
-    None
-}
 
 fn get_image(url: String) {
     println!("in get image {:?}", url);
