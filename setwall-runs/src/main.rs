@@ -1,18 +1,20 @@
-use std::collections::HashMap;
-use std::convert::TryInto;
+mod settings;
+
+use serde::Deserialize;
 use std::ffi::OsStr;
 use std::fs;
 use std::os;
 use std::path::Path;
 use std::process;
 use std::thread;
-use tinyjson::JsonValue;
 use websocket::OwnedMessage;
+
 static WEBSOCKET_ADDRESS: &str = "127.0.0.1:7878";
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let server = websocket::sync::Server::bind(WEBSOCKET_ADDRESS).unwrap();
 
+    // websocket handler spawner
     for connection in server.filter_map(Result::ok) {
         thread::spawn(|| {
             let client = connection.accept().unwrap();
@@ -25,17 +27,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         println!("{}", text);
                         if text.starts_with("url by setwall") {
                             handle_connection(text.split_whitespace().last().unwrap().to_string());
+                        } else if text.starts_with("url by wallhere") {
+                            // handle this later.
                         }
                     }
-                    OwnedMessage::Binary(_blob) => (),
                     OwnedMessage::Close(_) => {
                         sender.send_message(&OwnedMessage::Close(None)).ok();
                         return;
                     }
-                    OwnedMessage::Ping(data) => {
-                        println!("{:?}", data);
-                    }
-                    OwnedMessage::Pong(_) => (),
+                    _ => (),
                 }
             }
         });
@@ -58,16 +58,21 @@ fn handle_connection(mut url: String) {
     get_image(url);
 }
 
+#[derive(Deserialize)]
+struct PathData {
+    path: String,
+}
+
 fn url_from_wallhaven(api_url: String) -> Option<String> {
-    let res = reqwest::blocking::get(api_url);
-    if res.as_ref().is_ok_and(|data| data.status() == 200) {
-        let js: JsonValue = res.unwrap().text().unwrap().as_str().parse().unwrap();
-        println!("{:#?}", js);
-        let js: &HashMap<String, JsonValue> = (js.get::<HashMap<String, JsonValue>>().unwrap())
-            ["data"]
-            .get()
-            .unwrap();
-        return js["path"].get::<String>().cloned();
+    if let Ok(response) = reqwest::blocking::get(api_url) {
+        if response.status() == 200 {
+            return Some(
+                response
+                    .json::<PathData>()
+                    .expect("Image path failed in parsing!")
+                    .path,
+            );
+        }
     }
     None
 }
@@ -97,7 +102,7 @@ fn get_image(url: String) {
 }
 
 fn set_wall(original: &String) {
-    set_wall_nitrogen(original);
+    let wall_daemon = set_wall_nitrogen(original);
     set_wall_ww(original);
 }
 
