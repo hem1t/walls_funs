@@ -1,5 +1,6 @@
-use std::path::PathBuf;
 use std::fs::{self};
+use std::path::PathBuf;
+use paste::paste;
 
 use serde::Deserialize;
 
@@ -15,15 +16,22 @@ pub(crate) struct Settings {
     pub wall_cmd: String,
 }
 
+macro_rules! create_getter {
+    ($serv:ident.$set:ident) => {
+        paste! {
+            pub fn [<$serv _ $set _or>]<'a>(&'a self, or: &'a str) -> String {
+                self.$serv
+                    .as_ref()
+                    .and_then(|s| s.$set.as_ref().map(|s| s.clone()))
+                    .unwrap_or(or.to_owned())
+            }
+        }
+    };
+}
+
 impl Settings {
-    pub fn get_wallhaven_settings(&self) -> (String, String) {
-        self.wallhaven.as_ref().map(|w| {
-            (
-                w.api_key.clone().unwrap_or("".to_string()),
-                w.prefix.clone().unwrap_or("wallhaven".to_string()),
-            )
-        }).unwrap()
-    }
+    create_getter!(wallhaven.prefix);
+    create_getter!(wallhaven.api_key);
 }
 
 
