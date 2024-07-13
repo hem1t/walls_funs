@@ -98,6 +98,6 @@ fn data_from_api(id: &String, key: &String) -> Result<APIData> {
             )
         })?);
     } else {
-        bail!("Response Code resolved to: {}", response.status());
+        bail!("Wallhaven api response code failed with status code of \"{}\"", response.status());
     }
 }

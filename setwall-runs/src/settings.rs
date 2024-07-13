@@ -62,12 +62,11 @@ fn read_example_config() {
     );
 }
 
-// FIXME: fails at the moment
-// TODO: add ~ / and environment resolver
 #[test]
 fn default_settings() {
+    use resolve_path::PathResolveExt;
     assert!(
-        Settings::from_file("~/.config/hypr/hyprland.conf".into()).is_ok(),
+        Settings::from_file("~/.config/wall_funs/config.toml".resolve().to_path_buf()).is_ok(),
     );
 }
 
