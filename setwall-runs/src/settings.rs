@@ -1,5 +1,4 @@
-use std::fs::{self};
-use std::path::PathBuf;
+use std::{fs, path::PathBuf};
 use paste::paste;
 
 use serde::Deserialize;
@@ -14,6 +13,7 @@ pub(crate) struct WallhavenSettings {
 pub(crate) struct Settings {
     pub wallhaven: Option<WallhavenSettings>,
     pub wall_cmd: String,
+    pub dir_path: String,
 }
 
 macro_rules! create_getter {
@@ -40,6 +40,10 @@ impl Settings {
         let file_data = fs::read_to_string(path)?;
         Ok(toml::from_str::<Settings>(&file_data)?)
     }
+
+    pub fn dir_path(&self) -> &String {
+        &self.dir_path
+    }
 }
 
 #[test]
@@ -51,7 +55,19 @@ fn read_example_config() {
                 api_key: Some("hello I'm api_key".to_string()),
                 prefix: Some("wallhaven".to_string())
             }),
-            wall_cmd: "nitrogen".to_string()
+            wall_cmd: "nitrogen".to_string(),
+            dir_path: "/path/to/images".to_string()
+
         }
     );
 }
+
+// FIXME: fails at the moment
+// TODO: add ~ / and environment resolver
+#[test]
+fn default_settings() {
+    assert!(
+        Settings::from_file("~/.config/hypr/hyprland.conf".into()).is_ok(),
+    );
+}
+

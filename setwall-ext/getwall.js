@@ -1,29 +1,29 @@
 browser.menus.create({
     id: "image_clicked_by_setwall",
-    title: "setwall",
+    title: "set as wall",
     contexts: ["image"],
-    onclick: (info, tab) => {
-        let asock = new WebSocket("ws://127.0.0.1:7878", "rust-websocket");
+    onclick: (info, _) => {
         console.log(info);
-        asock.onopen = (event) => {
-            asock.send(`url by setwall ` + info.srcUrl);
+        let asock = new WebSocket("ws://127.0.0.1:7878", "rust-websocket");
+        asock.onopen = (_) => {
+            asock.send(`url by setwall:` + info.srcUrl);
         };
     }
 });
 
 browser.runtime.onMessage.addListener(
-    (data, sender) => {
+    (data, _) => {
         if (data === "visited") {
             // 
             browser.menus.create({
                 id: "wallhaven_link_clicked_by_setwall",
                 title: "setwall by link",
                 contexts: ["link"],
-                onclick: (info, tab) => {
-                    let asock = new WebSocket("ws://127.0.0.1:7878", "rust-websocket");
+                onclick: (info, _) => {
                     console.log(info);
-                    asock.onopen = (event) => {
-                        asock.send(`url by setwall ` + info.linkUrl);
+                    let asock = new WebSocket("ws://127.0.0.1:7878", "rust-websocket");
+                    asock.onopen = (_) => {
+                        asock.send(`wallhaven url:` + info.linkUrl);
                     };
                 }
             });

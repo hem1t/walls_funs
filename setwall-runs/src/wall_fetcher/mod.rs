@@ -10,8 +10,6 @@ pub(crate) enum DownloadError {
 }
 
 pub(crate) trait ImageFetcher {
-    fn new(settings: &Settings, url: &String) -> Self;
-
     fn get_url(&self) -> &String;
 
     fn get_prefix(&self) -> &String;
@@ -30,7 +28,7 @@ pub(crate) trait ImageFetcher {
             Err(e) => return Err(DownloadError::FetchError(e))
         };
 
-        self.write_to_file(dir_path, bytes);
+        self.write_to_file(dir_path, bytes)?;
         Ok(())
     }
 

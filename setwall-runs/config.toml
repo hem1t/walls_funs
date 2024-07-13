@@ -1,4 +1,5 @@
 wall_cmd = "nitrogen"
+dir_path = "/path/to/images"
 
 [wallhaven]
 api_key = "hello I'm api_key"
