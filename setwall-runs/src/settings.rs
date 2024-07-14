@@ -5,6 +5,11 @@ use getset::Getters;
 use serde::Deserialize;
 
 #[derive(Debug, PartialEq, Deserialize)]
+pub(crate) struct GeneralSettings {
+    pub prefix: Option<String>,
+}
+
+#[derive(Debug, PartialEq, Deserialize)]
 pub(crate) struct WallhavenSettings {
     pub api_key: Option<String>,
     pub prefix: Option<String>,
@@ -12,6 +17,7 @@ pub(crate) struct WallhavenSettings {
 
 #[derive(Debug, PartialEq, Deserialize, Getters)]
 pub(crate) struct Settings {
+    pub general: Option<GeneralSettings>,
     pub wallhaven: Option<WallhavenSettings>,
     #[getset(get = "pub")]
     pub wall_cmd: String,
@@ -35,6 +41,7 @@ macro_rules! create_getter {
 impl Settings {
     create_getter!(wallhaven.prefix, "wallhaven");
     create_getter!(wallhaven.api_key, "");
+    create_getter!(general.prefix, "wall");
 }
 
 
