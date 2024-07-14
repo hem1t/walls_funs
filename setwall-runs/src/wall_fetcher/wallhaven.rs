@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use anyhow::{bail, Context, Result};
 use serde::Deserialize;
 
@@ -11,10 +13,11 @@ pub(crate) struct Wallhaven {
     id: String,
     image_url: String,
     image_format: String,
+    pub settings: Arc<Settings>,
 }
 
 impl Wallhaven {
-    pub fn new(settings: &Settings, url: &str) -> Result<Self> {
+    pub fn new(settings: Arc<Settings>, url: &str) -> Result<Self> {
         let prefix = settings.wallhaven_prefix_or("wallhaven");
         let api_key = settings.wallhaven_api_key_or("");
         let (id, image_url, image_format) =
@@ -25,6 +28,7 @@ impl Wallhaven {
             id,
             image_url,
             image_format,
+            settings
         })
     }
 }
@@ -45,6 +49,10 @@ impl ImageFetcher for Wallhaven {
     fn get_format(&self) -> &String {
         &self.image_format
     }
+
+    fn settings(&self) -> &Settings {
+        &self.settings
+    }
 }
 
 impl Wallhaven {
@@ -58,7 +66,7 @@ impl Wallhaven {
 
 #[derive(Deserialize)]
 struct APIData {
-    data: WallAPIData
+    data: WallAPIData,
 }
 
 #[derive(Deserialize)]
@@ -98,6 +106,9 @@ fn data_from_api(id: &String, key: &String) -> Result<APIData> {
             )
         })?);
     } else {
-        bail!("Wallhaven api response code failed with status code of \"{}\"", response.status());
+        bail!(
+            "Wallhaven api response code failed with status code of \"{}\"",
+            response.status()
+        );
     }
 }

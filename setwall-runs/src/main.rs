@@ -1,10 +1,10 @@
 mod settings;
 mod wall_fetcher;
 
+use resolve_path::PathResolveExt;
 use settings::Settings;
 use wall_fetcher::wallhaven::Wallhaven;
 use wall_fetcher::ImageFetcher;
-use resolve_path::PathResolveExt;
 
 use std::sync::Arc;
 use std::thread;
@@ -12,7 +12,7 @@ use websocket::OwnedMessage;
 
 static WEBSOCKET_ADDRESS: &str = "127.0.0.1:7878";
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() {
     let settings = Arc::new(
         Settings::from_file("~/.config/wall_funs/config.toml".resolve().to_path_buf())
             .expect("Couldn't read config file"),
@@ -35,7 +35,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         if text.starts_with("url by setwall:") {
                             println!("{:?}", text.split_once(":").unwrap_or_default().1);
                         } else if text.starts_with("wallhaven url:") {
-                            Wallhaven::new(&settings, text.split_once(':').unwrap_or_default().1).unwrap().download_image(settings.dir_path().to_owned());
+                            Wallhaven::new(
+                                settings.clone(),
+                                text.split_once(':').unwrap_or_default().1,
+                            )
+                            .unwrap()
+                            .download_image()
+                            .unwrap()
+                            .setting_wall()
+                            .unwrap();
                         }
                     }
                     OwnedMessage::Close(_) => {
@@ -47,6 +55,4 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         });
     }
-    Ok(())
 }
-

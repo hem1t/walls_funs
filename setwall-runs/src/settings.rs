@@ -1,5 +1,6 @@
 use std::{fs, path::PathBuf};
 use paste::paste;
+use getset::Getters;
 
 use serde::Deserialize;
 
@@ -9,10 +10,12 @@ pub(crate) struct WallhavenSettings {
     pub prefix: Option<String>,
 }
 
-#[derive(Debug, PartialEq, Deserialize)]
+#[derive(Debug, PartialEq, Deserialize, Getters)]
 pub(crate) struct Settings {
     pub wallhaven: Option<WallhavenSettings>,
+    #[getset(get = "pub")]
     pub wall_cmd: String,
+    #[getset(get = "pub")]
     pub dir_path: String,
 }
 
@@ -39,10 +42,6 @@ impl Settings {
     pub fn from_file(path: PathBuf) -> Result<Self, Box<dyn std::error::Error>> {
         let file_data = fs::read_to_string(path)?;
         Ok(toml::from_str::<Settings>(&file_data)?)
-    }
-
-    pub fn dir_path(&self) -> &String {
-        &self.dir_path
     }
 }
 
