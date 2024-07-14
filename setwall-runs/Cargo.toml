@@ -7,7 +7,6 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.86"
-cli-clipboard = "0.4.0"
 getset = "0.1.2"
 paste = "1.0.15"
 reqwest = { version = "0.12.5", features = ["json", "blocking"] }
@@ -16,7 +15,3 @@ serde = { version = "1.0.204", features = ["derive"] }
 thiserror = "1.0.62"
 toml = "0.8.14"
 websocket = "0.27.1"
-
-[[bin]]
-name = "setclipw"
-path = "src/wall_from_clipboard.rs"
