@@ -101,7 +101,7 @@ fn data_from_api(id: &String, key: &String) -> Result<APIData> {
     if response.status() == 200 {
         return Ok(response.json::<APIData>().with_context(|| {
             format!(
-                "Fetch data from {}, couldn't be parsed!",
+                "Fetched data from {}, couldn't be parsed!",
                 api_url.split_once('?').unwrap().0
             )
         })?);

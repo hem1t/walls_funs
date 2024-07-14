@@ -37,9 +37,11 @@ pub(crate) trait ImageFetcher {
     fn download_image(&self) -> Result<&Self, DownloadError> {
         let path = self.file_path();
         if path.exists() {
+            println!("File: {:?} already exists!", path.file_name());
             return Ok(self);
         }
 
+        println!("Downloading file!");
         let resp = match reqwest::blocking::get(self.get_url()) {
             Ok(r) => r,
             Err(e) => return Err(DownloadError::FetchError(e)),
@@ -62,6 +64,7 @@ pub(crate) trait ImageFetcher {
             .arg(path)
             .output()
             .expect("failed setting");
+        println!("setting wall ouput: {_out:?}");
         Ok(())
     }
 }
