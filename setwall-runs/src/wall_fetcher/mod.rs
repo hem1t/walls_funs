@@ -64,7 +64,7 @@ pub(crate) trait ImageFetcher {
             .arg(path)
             .output()
             .expect("failed setting");
-        println!("setting wall ouput: {_out:?}");
+        println!("setting wall output: {_out:?}");
         Ok(())
     }
 }

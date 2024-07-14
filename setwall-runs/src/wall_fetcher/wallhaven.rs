@@ -18,8 +18,8 @@ pub(crate) struct Wallhaven {
 
 impl Wallhaven {
     pub fn new(settings: Arc<Settings>, url: &str) -> Result<Self> {
-        let prefix = settings.wallhaven_prefix_or("wallhaven");
-        let api_key = settings.wallhaven_api_key_or("");
+        let prefix = settings.wallhaven_prefix();
+        let api_key = settings.wallhaven_api_key();
         let (id, image_url, image_format) =
             Wallhaven::read_link_url(&api_key.to_string(), &url.to_string())?;
 

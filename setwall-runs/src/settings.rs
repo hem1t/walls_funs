@@ -20,21 +20,21 @@ pub(crate) struct Settings {
 }
 
 macro_rules! create_getter {
-    ($serv:ident.$set:ident) => {
+    ($serv:ident.$set:ident, $or:expr) => {
         paste! {
-            pub fn [<$serv _ $set _or>]<'a>(&'a self, or: &'a str) -> String {
+            pub fn [<$serv _ $set>]<'a>(&'a self) -> String {
                 self.$serv
                     .as_ref()
                     .and_then(|s| s.$set.as_ref().map(|s| s.clone()))
-                    .unwrap_or(or.to_owned())
+                    .unwrap_or($or.to_owned())
             }
         }
     };
 }
 
 impl Settings {
-    create_getter!(wallhaven.prefix);
-    create_getter!(wallhaven.api_key);
+    create_getter!(wallhaven.prefix, "wallhaven");
+    create_getter!(wallhaven.api_key, "");
 }
 
 
