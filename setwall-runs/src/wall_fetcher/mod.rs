@@ -4,6 +4,7 @@ use std::{fs, io, path::PathBuf, process::Command};
 use thiserror::Error;
 
 pub(crate) mod wallhaven;
+mod any_image_url;
 
 #[derive(Debug, Error)]
 pub(crate) enum DownloadError {

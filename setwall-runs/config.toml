@@ -1,6 +1,9 @@
 wall_cmd = "nitrogen"
 dir_path = "/path/to/images"
 
+[all]
+prefix = "wall"
+
 [wallhaven]
 api_key = "hello I'm api_key"
 prefix = "wallhaven"
